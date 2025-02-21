@@ -1,0 +1,531 @@
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EstudoAI - Formatador Inteligente com Gemini</title>
+  <style>
+    :root {
+      --primary-color: #4285f4;
+      --secondary-color: #34a853;
+      --accent-color: #fbbc05;
+      --error-color: #ea4335;
+      --dark-color: #333;
+      --light-color: #f9f9f9;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light-color);
+      color: var(--dark-color);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    header h1 {
+      color: var(--primary-color);
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    header p {
+      color: var(--dark-color);
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    @media (min-width: 992px) {
+      .app-container {
+        flex-direction: row;
+        align-items: stretch;
+      }
+    }
+    
+    .input-section, .preview-section {
+      flex: 1;
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .input-section {
+      gap: 15px;
+    }
+    
+    h2 {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      resize: vertical;
+      font-size: 1rem;
+      flex-grow: 1;
+    }
+    
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+    
+    .option-group {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .option-group h3 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: var(--dark-color);
+    }
+    
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .option-item input[type="checkbox"] {
+      accent-color: var(--primary-color);
+      width: 16px;
+      height: 16px;
+    }
+    
+    .filename-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .filename-container input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      background-color: #3367d6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      background-color: #b6b6b6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    #generateBtn {
+      width: 100%;
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+    
+    .preview-section {
+      position: relative;
+    }
+    
+    #loader {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      z-index: 10;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    #previewContent {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      min-height: 400px;
+    }
+    
+    .document-page {
+      background-color: white;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 2px;
+    }
+    
+    .mind-map {
+      background-color: #f5f7ff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .info-box {
+      background-color: #e8f5e9;
+      border-left: 4px solid var(--secondary-color);
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 0 5px 5px 0;
+    }
+    
+    .summary-section {
+      background-color: #fff8e1;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .summary-section h3 {
+      color: #ff8f00;
+      margin-bottom: 10px;
+    }
+    
+    .highlight {
+      background-color: #ffff8d;
+      padding: 0 3px;
+    }
+    
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    #downloadBtn {
+      background-color: var(--secondary-color);
+    }
+    
+    #downloadBtn:hover {
+      background-color: #2d9649;
+    }
+    
+    .error-message {
+      color: var(--error-color);
+      background-color: #ffebee;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    /* Estilos adicionais para o documento gerado */
+    .document-title {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 10px;
+    }
+    
+    .section-title {
+      color: var(--secondary-color);
+      margin-top: 25px;
+      margin-bottom: 15px;
+      font-size: 20px;
+      border-left: 3px solid var(--accent-color);
+      padding-left: 10px;
+    }
+    
+    .paragraph {
+      margin-bottom: 15px;
+      line-height: 1.7;
+      text-align: justify;
+    }
+    
+    .key-concept {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .mind-map-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .mind-map-node {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .mind-map-main-node {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      margin-top: 3px;
+    }
+    
+    .mind-map-sub-node {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      margin-top: 5px;
+    }
+    
+    .mind-map-content {
+      flex: 1;
+    }
+    
+    .mind-map-subnodes {
+      margin-left: 30px;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .info-box-title {
+      font-weight: bold;
+      color: var(--secondary-color);
+      margin-bottom: 8px;
+    }
+    
+    .summary-title {
+      font-weight: bold;
+      color: #ff8f00;
+      margin-bottom: 10px;
+    }
+    
+    .placeholder-text {
+      color: #888;
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#4285F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="#34A853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="#FBBC05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        EstudoAI com Gemini
+      </h1>
+      <p>Transforme seus textos em materiais de estudo estruturados e enriquecidos com IA de última geração</p>
+    </header>
+    
+    <main class="app-container">
+      <section class="input-section">
+        <h2>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 4H4V11H11V4Z" stroke="#4285F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 4H13V11H20V4Z" stroke="#34A853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 13H13V20H20V13Z" stroke="#FBBC05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M11 13H4V20H11V13Z" stroke="#EA4335" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Insira seu texto
+        </h2>
+        <textarea id="inputText" placeholder="Cole aqui o texto que deseja formatar para estudo..."></textarea>
+        
+        <div class="options">
+          <div class="option-group">
+            <h3>Formatação</h3>
+            <div class="option-item">
+              <input type="checkbox" id="formatHeadings" checked>
+              <label for="formatHeadings">Identificar e formatar títulos/subtítulos</label>
+            </div>
+            <div class="option-item">
+              <input type="checkbox" id="highlightKeywords" checked>
+              <label for="highlightKeywords">Destacar palavras-chave</label>
+            </div>
+          </div>
+          
+          <div class="option-group">
+            <h3>Conteúdo Adicional</h3>
+            <div class="option-item">
+              <input type="checkbox" id="createMindMap" checked>
+              <label for="createMindMap">Gerar mapa mental</label>
+            </div>
+            <div class="option-item">
+              <input type="checkbox" id="createInfoBoxes" checked>
+              <label for="createInfoBoxes">Criar quadros informativos</label>
+            </div>
+            <div class="option-item">
+              <input type="checkbox" id="createSummary" checked>
+              <label for="createSummary">Gerar resumo direcionado</label>
+            </div>
+          </div>
+
+          <div class="option-group">
+            <h3>Resumo Rápido</h3>
+            <div class="quick-summary-inputs">
+              <input type="text" id="subjectInput" placeholder="Digite a matéria (ex: História)" />
+              <input type="text" id="topicInput" placeholder="Digite o assunto (ex: Revolução Francesa)" />
+              <button id="quickSummaryBtn" class="secondary-button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Gerar Resumo Rápido
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="filename-container">
+          <input type="text" id="pdfFileName" placeholder="Nome do arquivo PDF (opcional)" value="material-de-estudo">
+          <span>.pdf</span>
+        </div>
+        
+        <button id="generateBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2v6m0 0l-3-3m3 3l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 13l3.293 3.293a1 1 0 001.414 0L12 11l5.293 5.293a1 1 0 001.414 0L22 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19 20H5a2 2 0 01-2-2V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Gerar Material de Estudo
+        </button>
+        
+        <div id="errorMessage" class="error-message"></div>
+      </section>
+      
+      <section class="preview-section">
+        <h2>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 3h20v18H2V3z" stroke="#4285F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 3v18" stroke="#34A853" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 8h6" stroke="#FBBC05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 13h6" stroke="#FBBC05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 18h6" stroke="#FBBC05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Visualização
+        </h2>
+        <div id="loader">
+          <div class="spinner"></div>
+          <p>Processando seu conteúdo com IA do Google Gemini...</p>
+        </div>
+        <div id="previewContent">
+          <p class="placeholder-text">Seu material de estudo aparecerá aqui após o processamento.</p>
+        </div>
+        <div class="actions">
+          <div class="filename-container" style="margin-top: 0;">
+            <input type="text" id="pdfFileNameCopy" placeholder="Nome do arquivo PDF" value="material-de-estudo">
+            <span>.pdf</span>
+          </div>
+          <button id="downloadBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Baixar PDF
+          </button>
+        </div>
+      </section>
+    </main>
+    
+    <footer>
+      <p>EstudoAI 2025 - Potencializado por Google Gemini AI</p>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
