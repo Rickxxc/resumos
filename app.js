@@ -125,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
     - Enfatize diferenças entre conceitos similares que geram confusão
     - Inclua "Fique Atento!" para pontos cruciais
     - Ao final de cada conceito, inclua algumas questões comentadas de concursos anteriores, relacionadas ao tema.
+    - Busque sempre as informações mais recentes e atualizadas sobre o tema, de forma a evitar informações desatualizadas.
   
     O material deve incluir:`;
     
@@ -258,13 +259,22 @@ document.addEventListener('DOMContentLoaded', function() {
   async function generateQuickSummary() {
     const subject = document.getElementById('subjectInput').value.trim();
     const topic = document.getElementById('topicInput').value.trim();
+    const subtopic = document.getElementById('subtopicInput').value.trim();
     
     if (!subject || !topic) {
       showError("Por favor, preencha a matéria e o assunto para gerar o resumo rápido.");
       return;
     }
 
-    const prompt = `Crie um material de estudo completo sobre ${topic} na matéria de ${subject}, otimizado para concursos públicos. 
+    let prompt = `Crie um material de estudo completo`;
+
+    if (subtopic) {
+      prompt += ` sobre o sub-tópico: ${subtopic}, dentro do tópico maior: ${topic}`;
+    } else {
+      prompt += ` sobre o tópico: ${topic}`;
+    }
+    
+    prompt += ` na matéria de ${subject}, otimizado para concursos públicos. 
   
     Inclua:
     - Conceitos fundamentais e definições exatas cobradas em provas
@@ -275,7 +285,9 @@ document.addEventListener('DOMContentLoaded', function() {
     - Armadilhas comuns em questões objetivas
     - Correlações com outros temas frequentemente associados
     
-    O material deve ser estruturado para máxima eficiência na preparação para provas objetivas.`;
+    O material deve ser estruturado para máxima eficiência na preparação para provas objetivas.
+    
+    Busque sempre as informações mais recentes e atualizadas sobre o tema, de forma a evitar informações desatualizadas.`;
 
     try {
       document.getElementById('quickSummaryBtn').disabled = true;
