@@ -124,7 +124,8 @@ document.addEventListener('DOMContentLoaded', function() {
     - Organize os conceitos do mais básico ao mais complexo
     - Enfatize diferenças entre conceitos similares que geram confusão
     - Inclua "Fique Atento!" para pontos cruciais
-    - Ao final de cada conceito, inclua algumas questões comentadas de concursos anteriores, relacionadas ao tema.
+    - Ao final de cada conceito, inclua APENAS questões reais de concursos anteriores que já foram aplicadas em provas oficiais, indicando o ano e o órgão/banca. NÃO INVENTE questões nem utilize questões que não tenham fonte verificável.
+    - Para cada questão, cite a fonte completa (Concurso, Órgão, Ano e Banca)
     - Busque sempre as informações mais recentes e atualizadas sobre o tema, de forma a evitar informações desatualizadas.
   
     O material deve incluir:`;
@@ -284,6 +285,8 @@ document.addEventListener('DOMContentLoaded', function() {
     - Dicas de resolução e memorização
     - Armadilhas comuns em questões objetivas
     - Correlações com outros temas frequentemente associados
+    - APENAS questões reais de concursos anteriores que já foram aplicadas em provas oficiais, indicando o ano e o órgão/banca responsável
+    - Para cada questão, cite a fonte completa (Concurso, Órgão, Ano e Banca)
     
     O material deve ser estruturado para máxima eficiência na preparação para provas objetivas.
     
