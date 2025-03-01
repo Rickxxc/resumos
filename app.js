@@ -19,13 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Generate study material
   async function generateStudyMaterial() {
-    const text = inputText.value.trim();
-    
-    if (!text) {
-      showError("Por favor, insira algum texto para processar.");
-      return;
-    }
-
     // Show loading state
     errorMessage.style.display = 'none';
     previewContent.style.display = 'none';
@@ -41,6 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
         createSummary: document.getElementById('createSummary').checked
       };
 
+      const text = document.getElementById('subjectInput').value.trim() + ' ' + 
+                   document.getElementById('topicInput').value.trim() + ' ' + 
+                   document.getElementById('subtopicInput').value.trim();
+                   
       const processedContent = await processWithGeminiAPI(text, options);
       previewContent.innerHTML = processedContent;
       previewContent.style.display = 'block';
@@ -256,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Quick Summary Generation
+  // Generate quick summary
   async function generateQuickSummary() {
     const subject = document.getElementById('subjectInput').value.trim();
     const topic = document.getElementById('topicInput').value.trim();
@@ -302,8 +299,8 @@ document.addEventListener('DOMContentLoaded', function() {
         createSummary: true
       });
       
-      inputText.value = response;
-      await generateStudyMaterial();
+      previewContent.innerHTML = response;
+      previewContent.style.display = 'block';
     } catch (error) {
       showError("Erro ao gerar resumo rápido: " + error.message);
     } finally {
