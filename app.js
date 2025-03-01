@@ -160,11 +160,10 @@ document.addEventListener('DOMContentLoaded', function() {
     throw new Error("Formato de resposta inesperado da API Gemini");
   }
 
-  // Download as PDF
+  // Download as PDF - improved version with selectable text
   async function downloadAsPDF() {
     let fileName = (pdfFileNameCopy.value.trim() || "material-de-estudo") + '.pdf';
-    const { jsPDF } = window.jspdf;
-
+    
     downloadBtn.disabled = true;
     downloadBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px;"></div> Gerando...';
 
@@ -172,70 +171,28 @@ document.addEventListener('DOMContentLoaded', function() {
       // Clone the preview content
       const contentToCapture = previewContent.querySelector('.document-page').cloneNode(true);
       
-      // Create temporary container with exact styling
-      const tempContainer = document.createElement('div');
-      tempContainer.style.cssText = `
-        position: absolute;
-        left: -9999px;
-        width: 794px; /* A4 width in pixels at 96 DPI */
-        background: white;
-        padding: 0;
-        margin: 0;
-      `;
-      tempContainer.appendChild(contentToCapture);
-      document.body.appendChild(tempContainer);
-
-      // Configure html2canvas with better settings
-      const canvas = await html2canvas(contentToCapture, {
-        scale: 2, // Higher resolution
-        useCORS: true,
-        allowTaint: true,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: 794,
-        windowHeight: contentToCapture.offsetHeight,
-        backgroundColor: '#ffffff',
-      });
-
-      // Create PDF with proper dimensions
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
+      // Use html2pdf.js with improved configuration for text selection
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          allowTaint: true,
+          scrollY: 0
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+          compress: false
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
       
-      // Calculate scaling
-      const ratio = pdfWidth / imgWidth;
-      const scaled_height = imgHeight * ratio;
-      
-      // Add image to PDF, handling multiple pages if needed
-      let heightLeft = scaled_height;
-      let position = 0;
-      let page = 1;
-
-      while (heightLeft > 0) {
-        if (page > 1) {
-          pdf.addPage();
-        }
-        
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, scaled_height);
-        heightLeft -= pdfHeight;
-        position -= pdfHeight;
-        page++;
-      }
-
-      // Save the PDF
-      pdf.save(fileName);
-      
-      // Cleanup
-      document.body.removeChild(tempContainer);
+      await html2pdf().set(opt).from(contentToCapture).save();
 
     } catch (error) {
       console.error("Error generating PDF:", error);
