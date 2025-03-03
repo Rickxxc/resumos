@@ -125,53 +125,24 @@ document.addEventListener('DOMContentLoaded', function() {
     - Para cada questão, cite a fonte completa (Concurso, Órgão, Ano e Banca)
     - Busque sempre as informações mais recentes e atualizadas sobre o tema, de forma a evitar informações desatualizadas.
   
-    let prompt = `O material deve incluir:`;  
+    O material deve incluir:`;
+    
+    if (options.formatHeadings) {
+      prompt += `\n- Títulos e subtítulos hierarquizados para facilitar a revisão`;
+    }
+    if (options.highlightKeywords) {
+      prompt += `\n- Palavras-chave e termos técnicos destacados com a classe key-concept`;
+    }
+    if (options.createMindMap) {
+      prompt += `\n- Mapa mental estruturado usando as classes mind-map definidas`;
+    }
+    if (options.createInfoBoxes) {
+      prompt += `\n- Quadros destacando pontos estatisticamente mais cobrados usando as classes info-box`;
+    }
+    if (options.createSummary) {
+      prompt += `\n- Resumo estratégico na classe summary-section`;
+    }
 
-if (options.formatHeadings) {  
-  prompt += `\n- Títulos e subtítulos hierarquizados para facilitar a revisão`;  
-}  
-if (options.highlightKeywords) {  
-  prompt += `\n- Palavras-chave e termos técnicos destacados com a classe key-concept`;  
-}  
-if (options.createMindMap) {  
-  prompt += `\n- Mapa mental estruturado usando as classes mind-map definidas`;  
-}  
-if (options.createInfoBoxes) {  
-  prompt += `\n- Quadros destacando pontos estatisticamente mais cobrados usando as classes info-box`;  
-}  
-if (options.createSummary) {  
-  prompt += `\n- Resumo estratégico na classe summary-section`;  
-}  
-if (options.createExampleBoxes) {  
-  prompt += `\n- Exemplos práticos formatados com a classe example-box para diferenciar explicações teóricas de aplicações práticas`;  
-}  
-if (options.highlightCode) {  
-  prompt += `\n- Código-fonte destacado com sintaxe adequada, usando a classe code-snippet`;  
-}  
-if (options.createInteractiveQuestions) {  
-  prompt += `\n- Questões interativas com botões para revelar respostas ou múltipla escolha com feedback visual`;  
-}  
-if (options.createExercises) {  
-  prompt += `\n- Exercícios práticos organizados em desafios progressivos`;  
-}  
-if (options.createDiagrams) {  
-  prompt += `\n- Animações curtas ou diagramas interativos para representar conceitos complexos`;  
-}  
-if (options.includeNotesSection) {  
-  prompt += `\n- Espaço para anotações no final de cada seção para personalização do aprendizado`;  
-}  
-if (options.createFlashcards) {  
-  prompt += `\n- Flashcards gerados automaticamente com termos e conceitos-chave`;  
-}  
-if (options.useMnemonics) {  
-  prompt += `\n- Técnicas mnemônicas para facilitar a memorização de conceitos difíceis`;  
-}  
-if (options.enableAdaptiveMode) {  
-  prompt += `\n- Opção de leitura adaptável, incluindo modo claro/escuro`;  
-}  
-if (options.suggestStudyPaths) {  
-  prompt += `\n- Sugestões de estudo com base no progresso do usuário`;  
-}
     prompt += `\n\nTEXTO PARA FORMATAR:\n${text}
 
     IMPORTANTE: Mantenha rigorosamente a estrutura HTML e as classes CSS fornecidas para garantir a formatação correta.`;
