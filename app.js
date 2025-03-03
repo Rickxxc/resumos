@@ -212,16 +212,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Generate quick summary
   async function generateQuickSummary() {
+    generateContent(false);
+  }
+
+  // Generate deep dive content
+  async function generateDeepDive() {
+    generateContent(true);
+  }
+
+  // Generate content based on type
+  async function generateContent(isDeepDive) {
     const subject = document.getElementById('subjectInput').value.trim();
     const topic = document.getElementById('topicInput').value.trim();
     const subtopic = document.getElementById('subtopicInput').value.trim();
     
     if (!subject || !topic) {
-      showError("Por favor, preencha a matéria e o assunto para gerar o resumo rápido.");
+      showError("Por favor, preencha a matéria e o assunto para gerar o conteúdo.");
       return;
     }
 
-    let prompt = `Crie um material de estudo completo`;
+    let prompt = `Crie um material de estudo ${isDeepDive ? 'aprofundado e extenso' : 'completo'}`;
 
     if (subtopic) {
       prompt += ` sobre o sub-tópico: ${subtopic}, dentro do tópico maior: ${topic}`;
@@ -240,14 +250,31 @@ document.addEventListener('DOMContentLoaded', function() {
     - Armadilhas comuns em questões objetivas
     - Correlações com outros temas frequentemente associados
     - APENAS questões reais de concursos anteriores que já foram aplicadas em provas oficiais, indicando o ano e o órgão/banca responsável
-    - Para cada questão, cite a fonte completa (Concurso, Órgão, Ano e Banca)
+    - Para cada questão, cite a fonte completa (Concurso, Órgão, Ano e Banca)`;
+
+    if (isDeepDive) {
+      prompt += `
+      
+      Como este é um modo de aprofundamento, inclua também:
+      - Ampla contextualização histórica e teórica do tema
+      - Correntes doutrinárias e debates acadêmicos relevantes
+      - Jurisprudência atualizada e entendimentos recentes (quando aplicável)
+      - Todas as exceções e casos especiais relacionados ao tema
+      - Comparações com sistemas/modelos internacionais
+      - Perspectivas de evolução e tendências futuras do tema
+      - Análise detalhada de questões complexas de bancas renomadas
+      - Maior número de exemplos práticos e casos concretos`;
+    }
+    
+    prompt += `
     
     O material deve ser estruturado para máxima eficiência na preparação para provas objetivas.
     
     Busque sempre as informações mais recentes e atualizadas sobre o tema, de forma a evitar informações desatualizadas.`;
 
     try {
-      document.getElementById('quickSummaryBtn').disabled = true;
+      const buttonId = isDeepDive ? 'deepDiveBtn' : 'quickSummaryBtn';
+      document.getElementById(buttonId).disabled = true;
       const response = await processWithGeminiAPI(prompt, {
         formatHeadings: true,
         highlightKeywords: true,
@@ -259,14 +286,15 @@ document.addEventListener('DOMContentLoaded', function() {
       previewContent.innerHTML = response;
       previewContent.style.display = 'block';
     } catch (error) {
-      showError("Erro ao gerar resumo rápido: " + error.message);
+      showError(`Erro ao gerar ${isDeepDive ? 'aprofundamento' : 'resumo rápido'}: ` + error.message);
     } finally {
-      document.getElementById('quickSummaryBtn').disabled = false;
+      document.getElementById(isDeepDive ? 'deepDiveBtn' : 'quickSummaryBtn').disabled = false;
     }
   }
 
-  // Add event listener for quick summary
+  // Add event listeners for generation options
   document.getElementById('quickSummaryBtn').addEventListener('click', generateQuickSummary);
+  document.getElementById('deepDiveBtn').addEventListener('click', generateDeepDive);
 
   function showError(message) {
     errorMessage.textContent = message;
