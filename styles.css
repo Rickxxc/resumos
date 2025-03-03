@@ -22,6 +22,15 @@
   background-color: #e3a800;
 }
 
+.secondary-button.deep-dive {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.secondary-button.deep-dive:hover {
+  background-color: #1565c0;
+}
+
 .document-page {
   max-width: 800px;
   margin: 0 auto;
@@ -376,4 +385,15 @@ tr:hover {
   margin-top: 10px;
   font-style: italic;
   color: #555;
+}
+
+.generation-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+}
+
+.generation-buttons button {
+  flex: 1;
 }
